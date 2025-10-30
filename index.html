@@ -14,7 +14,7 @@
         <div class="title" id="levelTitle">Beach</div>
         <div id="timerLabel">–:–</div>
         <div id="totalScoreLabel">Total collected: 0</div>
-        <div class="tip">WASD to move, mouse to look · Space/Q ↑ Shift/E ↓</div>
+        <div class="tip">WASD to move, mouse to look · Space/Q ↑ Shift/E ↓ · VR: thumbsticks + trigger</div>
       </div>
     </div>
 
@@ -22,21 +22,27 @@
     <div id="dialog" class="dialog">
       <div class="dialog-box">
         <div id="dialogText">🐢 Please come help me clean the ocean!</div>
-        <button id="dialogBtn">Yes, I’ll help!</button>
+        <button id="dialogBtn" class="clickable">Yes, I’ll help!</button>
       </div>
     </div>
 
     <div id="info" class="dialog hidden">
       <div class="dialog-box">
         <div id="infoText">Info</div>
-        <button id="infoBtn">Next</button>
+        <button id="infoBtn" class="clickable">Next</button>
       </div>
     </div>
 
-    <a-scene id="scene" renderer="antialias: true" fog="type: none" background="color: #2b7a8b">
-  <a-sky id="sky" color="#2b7a8b"></a-sky>
+    <a-scene
+      id="scene"
+      renderer="antialias: true"
+      webxr="optionalFeatures: local-floor, hand-tracking"
+      background="color: #2b7a8b"
+    >
+      <!-- GLOBAL sky (must stay visible even when beach hides) -->
+      <a-sky id="sky" color="#2b7a8b"></a-sky>
 
-
+      <!-- Beach (simple) -->
       <a-entity id="beachEnv">
         <a-plane
           rotation="-90 0 0"
@@ -55,9 +61,16 @@
       </a-entity>
 
       <!-- Underwater (simple) -->
-      <a-entity id="underwaterEnv" visible="false">
+      <a-entity
+        id="underwaterEnv"
+        visible="false"
+        fog="type: exponential; color: #0a3d62; density: 0.045"
+      >
         <a-entity light="type: ambient; intensity: 0.45; color: #7fd0ff"></a-entity>
-        <a-entity light="type: directional; intensity: 0.65; color: #bfe9ff" position="0 6 -3"></a-entity>
+        <a-entity
+          light="type: directional; intensity: 0.65; color: #bfe9ff"
+          position="0 6 -3"
+        ></a-entity>
 
         <!-- seabed -->
         <a-plane
@@ -79,20 +92,19 @@
         ></a-entity>
       </a-entity>
 
-      <!-- Player -->
+      <!-- Player rig -->
       <a-entity
         id="rig"
         position="0 1.6 8"
         look-controls
-        simple-wasd="speed: 2.8"
-        simple-vertical="speed: 1.0; minY: -0.2; maxY: 8"
-        simple-drift="speed: 0"
+        simple-wasd
+        simple-vertical
+        simple-drift
+        vr-controls
       >
-        <a-entity camera>
-          <a-entity cursor="rayOrigin: mouse" raycaster="objects: .trash"></a-entity>
-        </a-entity>
+        <a-entity camera></a-entity>
 
-        <!-- hands + net -->
+        <!-- hands + net (super simple) -->
         <a-box
           id="leftHand"
           visible="false"
@@ -108,7 +120,7 @@
           <a-entity
             id="net"
             position="0 -0.02 -0.18"
-            net-collector="radius:0.45; score3D:#score3D"
+            net-collector="radius: 0.45; score3D: #score3D"
             net-boost
           >
             <a-ring
@@ -126,11 +138,19 @@
         </a-entity>
       </a-entity>
 
-      <!-- Simple VR controller entities -->
-      <a-entity laser-controls="hand: left"></a-entity>
-      <a-entity laser-controls="hand: right"></a-entity>
+      <!-- Quest 2 controllers (VR) -->
+      <a-entity
+        id="leftController"
+        oculus-touch-controls="hand: left"
+        laser-controls="hand: left"
+      ></a-entity>
+      <a-entity
+        id="rightController"
+        oculus-touch-controls="hand: right"
+        laser-controls="hand: right"
+      ></a-entity>
 
-      <!-- Turtle -->
+      <!-- Turtle (simple) -->
       <a-entity id="turtle" turtle-guide="offset: -0.4 0 -1.2">
         <a-sphere radius="0.18" color="#4caf50"></a-sphere>
         <a-box
@@ -146,6 +166,7 @@
         ></a-entity>
       </a-entity>
 
+      <!-- Game -->
       <a-entity id="game" game-manager></a-entity>
     </a-scene>
 
