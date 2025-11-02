@@ -2,41 +2,38 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Ocean Cleanup (Simple)</title>
+    <title>Ocean Cleanup (VR + Desktop)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- HUD -->
+    <!-- HUD (desktop only, VR won't see this) -->
     <div class="hud">
       <div class="panel">
-        <div class="title" id="levelTitle">Beach</div>
+        <div class="title" id="levelTitle">—</div>
         <div id="timerLabel">–:–</div>
         <div id="totalScoreLabel">Total collected: 0</div>
-        <div class="tip">WASD to move, mouse to look · Space/Q ↑ Shift/E ↓</div>
+        <div class="tip">
+          Desktop: click to start · VR: use both controllers
+        </div>
       </div>
     </div>
 
-    <!-- Dialogs -->
-    <div id="dialog" class="dialog">
-      <div class="dialog-box">
-        <div id="dialogText">🐢 Please come help me clean the ocean!</div>
-        <button id="dialogBtn">Yes, I’ll help!</button>
-      </div>
-    </div>
+    <!-- 3D scene -->
+    <a-scene
+      id="scene"
+      renderer="antialias: true"
+      webxr="optionalFeatures: local-floor, hand-tracking"
+      background="color: #6cacbb"
+    >
+      <!-- global light so start panel is never black -->
+      <a-entity light="type: ambient; intensity: 0.7; color: #ffffff"></a-entity>
 
-    <div id="info" class="dialog hidden">
-      <div class="dialog-box">
-        <div id="infoText">Info</div>
-        <button id="infoBtn">Next</button>
-      </div>
-    </div>
+      <!-- global sky (we darken this per level) -->
+      <a-sky id="sky" color="#6cacbb"></a-sky>
 
-    <a-scene id="scene" renderer="antialias: true" fog="type: none" background="color: #2b7a8b">
-  <a-sky id="sky" color="#2b7a8b"></a-sky>
-
-
+      <!-- beach / water line (start state) -->
       <a-entity id="beachEnv">
         <a-plane
           rotation="-90 0 0"
@@ -49,15 +46,24 @@
           rotation="-90 0 0"
           width="80"
           height="80"
-          position="0 0 -20"
+          position="0 0 -10"
           material="color:#5db8ff"
         ></a-plane>
       </a-entity>
 
-      <!-- Underwater (simple) -->
-      <a-entity id="underwaterEnv" visible="false">
-        <a-entity light="type: ambient; intensity: 0.45; color: #7fd0ff"></a-entity>
-        <a-entity light="type: directional; intensity: 0.65; color: #bfe9ff" position="0 6 -3"></a-entity>
+      <!-- UNDERWATER world (hidden until game starts) -->
+      <a-entity
+        id="underwaterEnv"
+        visible="false"
+        fog="type: exponential; color: #0a3d62; density: 0.045"
+      >
+        <a-entity
+          light="type: ambient; intensity: 0.45; color: #7fd0ff"
+        ></a-entity>
+        <a-entity
+          light="type: directional; intensity: 0.65; color: #bfe9ff"
+          position="0 6 -3"
+        ></a-entity>
 
         <!-- seabed -->
         <a-plane
@@ -71,7 +77,7 @@
         <!-- where trash is spawned -->
         <a-entity id="spawner"></a-entity>
 
-        <!-- small 3D score in front of camera -->
+        <!-- floating 3D score (for VR) -->
         <a-entity
           id="score3D"
           text="value: Trash: 0; align: center; color: white; width: 2"
@@ -79,20 +85,68 @@
         ></a-entity>
       </a-entity>
 
-      <!-- Player -->
+      <!-- 3D START PANEL (immersive) -->
+      <a-entity
+        id="startPanel"
+        position="0 1.6 -1.5"
+        visible="true"
+        clickable
+      >
+        <a-plane
+          width="1.8"
+          height="1"
+          color="#ffffff"
+          opacity="0.98"
+          radius="0.08"
+          material="shader: flat"
+        ></a-plane>
+        <a-entity
+          text="value: 🐢 Help me clean the ocean!\n\nKlik om te starten; align: center; color: #163344; width: 1.6"
+          position="0 0 0.01"
+        ></a-entity>
+      </a-entity>
+
+      <!-- 3D INFO PANEL (end of level) -->
+      <a-entity
+        id="infoPanel"
+        position="0 1.6 -1.4"
+        visible="false"
+      >
+        <a-plane
+          width="2.4"
+          height="1.5"
+          color="#ffffff"
+          opacity="0.97"
+          radius="0.09"
+          material="shader: flat"
+        ></a-plane>
+        <a-entity
+          id="infoPanelText"
+          text="value: Info; align: center; color: #163344; width: 2.1"
+          position="0 0.4 0.01"
+        ></a-entity>
+        <a-entity
+          id="infoPanelBtn"
+          geometry="primitive: plane; width: 0.5; height: 0.18"
+          material="color: #1673ff; shader: flat"
+          position="0 -0.55 0.02"
+          text="value: Next; align: center; color: #fff; width: 1.2"
+          class="interactive3d"
+        ></a-entity>
+      </a-entity>
+
+      <!-- PLAYER RIG (start right in front of panel) -->
       <a-entity
         id="rig"
-        position="0 1.6 8"
+        position="0 1.6 0"
         look-controls
-        simple-wasd="speed: 2.8"
-        simple-vertical="speed: 1.0; minY: -0.2; maxY: 8"
         simple-drift="speed: 0"
+        vr-swim
+        hand-vr-sync
       >
-        <a-entity camera>
-          <a-entity cursor="rayOrigin: mouse" raycaster="objects: .trash"></a-entity>
-        </a-entity>
+        <a-entity camera></a-entity>
 
-        <!-- hands + net -->
+        <!-- desktop hands (we re-parent in VR) -->
         <a-box
           id="leftHand"
           visible="false"
@@ -104,11 +158,16 @@
         ></a-box>
 
         <a-entity id="rightHand" visible="false" position="0.25 -0.15 -0.5">
-          <a-box depth="0.12" height="0.08" width="0.18" color="#f3d2a2"></a-box>
+          <a-box
+            depth="0.12"
+            height="0.08"
+            width="0.18"
+            color="#f3d2a2"
+          ></a-box>
           <a-entity
             id="net"
             position="0 -0.02 -0.18"
-            net-collector="radius:0.45; score3D:#score3D"
+            net-collector="radius: 0.5; score3D: #score3D"
             net-boost
           >
             <a-ring
@@ -126,11 +185,7 @@
         </a-entity>
       </a-entity>
 
-      <!-- Simple VR controller entities -->
-      <a-entity laser-controls="hand: left"></a-entity>
-      <a-entity laser-controls="hand: right"></a-entity>
-
-      <!-- Turtle -->
+      <!-- turtle (follows player in levels) -->
       <a-entity id="turtle" turtle-guide="offset: -0.4 0 -1.2">
         <a-sphere radius="0.18" color="#4caf50"></a-sphere>
         <a-box
@@ -140,12 +195,21 @@
           color="#2e7d32"
           position="0 0 -0.08"
         ></a-box>
-        <a-entity
-          text="value: Guide; color: white; align: center; width: 2"
-          position="0 0.4 0"
-        ></a-entity>
       </a-entity>
 
+      <!-- VR controllers -->
+      <a-entity
+        id="leftController"
+        oculus-touch-controls="hand: left"
+        laser-controls="hand: left"
+      ></a-entity>
+      <a-entity
+        id="rightController"
+        oculus-touch-controls="hand: right"
+        laser-controls="hand: right"
+      ></a-entity>
+
+      <!-- game root -->
       <a-entity id="game" game-manager></a-entity>
     </a-scene>
 
