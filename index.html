@@ -14,7 +14,9 @@
         <div class="title" id="levelTitle">Beach</div>
         <div id="timerLabel">–:–</div>
         <div id="totalScoreLabel">Total collected: 0</div>
-        <div class="tip">WASD to move, mouse to look · Space/Q ↑ Shift/E ↓</div>
+        <div class="tip">
+          Click to start · VR: right joystick = swim · right trigger ↑ · left trigger ↓
+        </div>
       </div>
     </div>
 
@@ -22,21 +24,27 @@
     <div id="dialog" class="dialog">
       <div class="dialog-box">
         <div id="dialogText">🐢 Please come help me clean the ocean!</div>
-        <button id="dialogBtn">Yes, I’ll help!</button>
+        <button id="dialogBtn" class="clickable">Yes, I’ll help!</button>
       </div>
     </div>
 
     <div id="info" class="dialog hidden">
       <div class="dialog-box">
         <div id="infoText">Info</div>
-        <button id="infoBtn">Next</button>
+        <button id="infoBtn" class="clickable">Next</button>
       </div>
     </div>
 
-    <a-scene id="scene" renderer="antialias: true" fog="type: none" background="color: #2b7a8b">
-  <a-sky id="sky" color="#2b7a8b"></a-sky>
+    <a-scene
+      id="scene"
+      renderer="antialias: true"
+      webxr="optionalFeatures: local-floor, hand-tracking"
+      background="color: #2b7a8b"
+    >
+      <!-- always-visible sky -->
+      <a-sky id="sky" color="#2b7a8b"></a-sky>
 
-
+      <!-- Beach -->
       <a-entity id="beachEnv">
         <a-plane
           rotation="-90 0 0"
@@ -54,10 +62,17 @@
         ></a-plane>
       </a-entity>
 
-      <!-- Underwater (simple) -->
-      <a-entity id="underwaterEnv" visible="false">
+      <!-- Underwater -->
+      <a-entity
+        id="underwaterEnv"
+        visible="false"
+        fog="type: exponential; color: #0a3d62; density: 0.045"
+      >
         <a-entity light="type: ambient; intensity: 0.45; color: #7fd0ff"></a-entity>
-        <a-entity light="type: directional; intensity: 0.65; color: #bfe9ff" position="0 6 -3"></a-entity>
+        <a-entity
+          light="type: directional; intensity: 0.65; color: #bfe9ff"
+          position="0 6 -3"
+        ></a-entity>
 
         <!-- seabed -->
         <a-plane
@@ -79,23 +94,21 @@
         ></a-entity>
       </a-entity>
 
-      <!-- Player -->
+      <!-- Player rig -->
+      <!-- set simple-drift to 0.15 if you want slow auto-floating -->
       <a-entity
         id="rig"
         position="0 1.6 8"
         look-controls
-        simple-wasd="speed: 2.8"
-        simple-vertical="speed: 1.0; minY: -0.2; maxY: 8"
         simple-drift="speed: 0"
+        vr-swim
+        hand-vr-sync
       >
-        <a-entity camera>
-          <a-entity cursor="rayOrigin: mouse" raycaster="objects: .trash"></a-entity>
-        </a-entity>
+        <a-entity camera></a-entity>
 
-        <!-- hands + net -->
+        <!-- desktop hands -->
         <a-box
           id="leftHand"
-          visible="false"
           depth="0.12"
           height="0.08"
           width="0.18"
@@ -103,13 +116,12 @@
           color="#f3d2a2"
         ></a-box>
 
-        <a-entity id="rightHand" visible="false" position="0.25 -0.15 -0.5">
+        <a-entity id="rightHand" position="0.25 -0.15 -0.5">
           <a-box depth="0.12" height="0.08" width="0.18" color="#f3d2a2"></a-box>
           <a-entity
             id="net"
             position="0 -0.02 -0.18"
-            net-collector="radius:0.45; score3D:#score3D"
-            net-boost
+            net-collector="radius: 0.45; score3D: #score3D"
           >
             <a-ring
               radius-inner="0.26"
@@ -125,10 +137,6 @@
           </a-entity>
         </a-entity>
       </a-entity>
-
-      <!-- Simple VR controller entities -->
-      <a-entity laser-controls="hand: left"></a-entity>
-      <a-entity laser-controls="hand: right"></a-entity>
 
       <!-- Turtle -->
       <a-entity id="turtle" turtle-guide="offset: -0.4 0 -1.2">
@@ -146,6 +154,19 @@
         ></a-entity>
       </a-entity>
 
+      <!-- VR controllers (quest 2) -->
+      <a-entity
+        id="leftController"
+        oculus-touch-controls="hand: left; model: false"
+        laser-controls="hand: left"
+      ></a-entity>
+      <a-entity
+        id="rightController"
+        oculus-touch-controls="hand: right; model: false"
+        laser-controls="hand: right"
+      ></a-entity>
+
+      <!-- Game root -->
       <a-entity id="game" game-manager></a-entity>
     </a-scene>
 
