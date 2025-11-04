@@ -1,38 +1,71 @@
-html, body { height: 100%; margin: 0; }
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
 
 /* HUD */
-.hud { position: fixed; top: 12px; right: 12px; z-index: 10; pointer-events: none; }
-.panel { background: rgba(0,0,0,.35); color: #fff; padding: 10px 14px; border-radius: 12px; }
-.title { font-weight: 700; margin-bottom: 4px; }
-.tip { opacity: 0.85; font-size: 12px; margin-top: 4px; }
-#timerLabel, #totalScoreLabel { margin-top: 6px; font-weight: 600; }
+.hud {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  pointer-events: none;
+}
+.panel {
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+.title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.tip {
+  opacity: 0.85;
+  font-size: 12px;
+  margin-top: 4px;
+}
+#timerLabel,
+#totalScoreLabel {
+  margin-top: 6px;
+  font-weight: 600;
+}
 
 /* Dialogs */
-.dialog { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,.35); z-index: 20; }
-.dialog.hidden { display:none; }
-.dialog-box { background:#ffffffee; padding:16px 18px; border-radius:14px; max-width: 520px; text-align:center; }
-.dialog-box button { margin-top:10px; padding:8px 14px; border-radius:10px; border:0; background:#1673ff; color:#fff; cursor:pointer; }
-
-/* Info board layout */
-.board { display:grid; grid-template-columns: 1fr 1fr; gap:18px; text-align:left; }
-.board h3 { margin:8px 0 6px; font-size:16px; }
-.board small { opacity:.8; }
-
-.board .panelbox {
-  background:#f6f7fb; border:1px solid #e3e6ef; border-radius:12px;
-  padding:12px;
+.dialog {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 20;
 }
-.board ul { margin:6px 0 0; padding-left:18px; }
-.board li { margin:2px 0; }
-
-.badge {
-  display:inline-block; min-width:18px; padding:2px 6px; border-radius:10px;
-  background:#e7f0ff; font-weight:700; font-size:12px; margin-right:6px;
+.dialog.hidden {
+  display: none;
+}
+.dialog-box {
+  background: #ffffffee;
+  padding: 16px 18px;
+  border-radius: 14px;
+  max-width: 520px;
+  text-align: center;
+}
+.dialog-box button {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 0;
+  background: #1673ff;
+  color: #fff;
+  cursor: pointer;
 }
 
-.kv { display:grid; grid-template-columns:auto 1fr; gap:6px 10px; align-items:center; }
-.kv .icon {
-  width:28px; height:28px; border-radius:6px; background:#dfe8ff; display:flex; align-items:center; justify-content:center;
-  font-size:16px;
+.clickable {
+  cursor: pointer;
 }
